@@ -1,10 +1,14 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
 //const { User } = require('./models');
-const User = require('./models');
+//const User = require('./models');
 
+const { User, Posts } = require('./models');
 
+const BCRYPT_COST = 11;
 const STATUS_USER_ERROR = 422;
 
 const server = express();
@@ -31,82 +35,114 @@ query.exec((err, result) => {
 });
 };
 
-// GET
+// GET for User data
 server.get('/users', (req, res) => {
-    console.log("went into get");
-    
  User.find({}, (err, data) => {
      if (err) { 
-         console.log('caused an error');
         res.json({err});
         return;
      }
-     console.og('went fine');
      res.json(data);
 });     
 });
 
+// GET for Post data
+server.get('/posts', (req, res) => {
+    Posts.find({}, (err, data) => {
+        if (err) { 
+           res.json({err});
+           return;
+        }
+        res.json(data);
+   });     
+   });
 
-// POST
+
+// POST (Email and Password Entry)
 server.post('/users', (req,res) => {
+    
+    const { email, password } = req.body; 
+     console.log(req.body);
+   
+     if (!email || !password) {
+        res.status(422);
+        res.json('missing text or complieted field');
+     return;
+     }
+   
+     const hashedPassword = bcrypt.hash(password, BCRYPT_COST, (hashErr, newHash) => {
+        if (hashErr) {
+          sendUserError(hashErr, res);
+          return;
+        }
+
+     const newUser = new User({email, passwordHash:newHash});
+      
+     newUser.save((err, user) => {
+       if (err) {
+        res.status(422);
+        res.json({'Erro saving user to DB: ': err.message})
+         return;
+       }
+       res.json(user);
+     });
+     
+   });
+});
+
+// POST (Post Hash, Subject, Notes, Picture)
+server.post('/posts', (req,res) => {
  
- const {firstName, lastName, email} = req.body; 
+ const {hash, subject, notes, image} = req.body; 
   console.log(req.body);
 
-  if (!firstName || !lastName || !email) {
+  if (!hash || !subject || !notes) {
      res.status(422);
      res.json('missing text or complieted field');
   return;
   }
 
-  //const newUser = new User(req.body);
-  const newUser = new User({firstName, lastName, email});
+  const newPost = new Posts({hash, subject, notes, email:'filp530@hotmail.com'});
    
-  newUser.save((err, user) => {
+  newPost.save((err, post) => {
     if (err) {
      res.status(422);
      res.json({'Erro saving user to DB: ': err.message})
       return;
     }
-    res.json(user);
+    res.json(post);
   });
-
-
-  //res.json('done');
-
-//    user.save((err, savedUser)=>{
-//    if (err) {
-//      res.status(500).json({ success: false, message: 'could not save the bear'});
-//      return;
-//     } else {
-//      //res.status(201).json(savedUser);
-//      res.json('done');
-//     }
-//   });
-
-
-//var promise = user.save();
-//res.json('done');
-
 
 });
 
 
-// mongoose.Promise = global.Promise;
-// const connect = mongoose.connect(
-//   'mongodb://localhost/',
-//   { useMongoClient: true }
-// );
+// // POST (old)
+// server.post('/users', (req,res) => {
+ 
+//  const {firstName, lastName, email} = req.body; 
+//   console.log(req.body);
 
+//   if (!firstName || !lastName || !email) {
+//      res.status(422);
+//      res.json('missing text or complieted field');
+//   return;
+//   }
 
-// connect.then(() => {
-//     const port = 3000;
-//     server.listen(port);
-//     console.log(`Server Listening on ${port}`);
-//   }, (err) => {
-//     console.log('\n************************');
-//     console.log("ERROR: Couldn't connect to MongoDB. Do you have it running?");
-//     console.log('************************\n');
+//   //const newUser = new User(req.body);
+//   const newUser = new User({firstName, lastName, email});
+   
+//   newUser.save((err, user) => {
+//     if (err) {
+//      res.status(422);
+//      res.json({'Erro saving user to DB: ': err.message})
+//       return;
+//     }
+//     res.json(user);
 //   });
+
+// });
+
+
+
 
 module.exports = { server };

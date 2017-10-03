@@ -13,7 +13,7 @@ C:\"Program Files"\MongoDB\Server\3.4\bin\mongod.exe --dbpath C:\Users\bone\bsca
    yes to everything
 
 3. Load the following in the project for NPM install
-    npm i --save express body-parser cors mongoose
+    npm i --save express body-parser cors mongoose bcrypt
 
 4. Install nodemon for continous restart and start so you don't have to run it
     npm install -g nodemon
