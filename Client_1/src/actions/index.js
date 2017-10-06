@@ -10,6 +10,31 @@ export const USER_UNAUTHENTICATED = 'USER_UNAUTHENTICATED';
 export const AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR';
 export const GET_USERS = 'GET_USERS';
 export const CHECK_IF_AUTHENTICATED = 'CHECK_IF_AUTHENTICATED';
+export const GET_POSTS = 'GET_POSTS';
+
+export const getPosts = () => {
+  // const promise = axios.get(`${ROOT_URL}/posts`);
+  // return {
+  //   type: GET_POSTS,
+  //   payload: promise,
+  // };
+  return (dispatch) => {
+    axios.post(`${ROOT_URL}/posts`)
+      .then(() => {
+        dispatch({
+          type: GET_POSTS,
+        });
+      
+      })
+      .catch(() => {
+        dispatch(authError('Failed to get the data'));
+      });
+  };
+
+
+};
+
+
 
 export const authError = (error) => {
   return {
@@ -97,3 +122,9 @@ export const getUsers = () => {
       });
   };
 };
+
+// Added this for the Posts page 
+export const userPosts = () => {
+   
+};
+

@@ -5,6 +5,7 @@ import SignIn from './components/signin';
 import Users from './components/users';
 import SignOut from './components/signout';
 import SignUp from './components/signup';
+import Posts from './components/posts'; // New stuff
 import RequireAuth from './components/HOC/RequireAuth';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
@@ -27,6 +28,7 @@ ReactDOM.render(
         <Route path="/users" component={RequireAuth(Users)} />
         <Route path="/signout" component={SignOut} />
         <Route path="/signup" component={SignUp} />
+        <Route path="/posts" component={Posts} />
       </div>
     </Router>
   </Provider>,
